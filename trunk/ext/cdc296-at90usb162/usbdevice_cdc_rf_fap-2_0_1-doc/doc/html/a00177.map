@@ -1,0 +1,5 @@
+base referer
+rect $a00024.html 214,56 283,83
+rect $a00021.html 414,6 547,32
+rect $a00022.html 404,56 556,83
+rect $a00016.html 332,107 628,134
