@@ -1,0 +1,17 @@
+#summary One-sentence summary of this page.
+#labels Featured,Phase-Implementation,Phase-Requirements
+
+= Development Board =
+*Host Machine* : I7 8GB RAM 1024 VRAM Windows 7/64
+
+== 1. Making a demo code run on AT90USB162 ==
+Let's start our application with the demo code from LUFA Device/ClassDriver/VirtualSerial in `/ext/LUFA-111009/Demos/Device/ClassDriver/VirtualSerial`. This folder is copied into `/src` and since it's not coded for AT90USB162, we have to modify it to make it run.
+
+=== Requirements ===
+The high-level requirements for this application are:
+  # Connecting the Minimus AVR on an USB port on Windows 7/64 it shall enable a COMPORT.
+  # This COMPORT shall be available for connecting with a hyperterminal application (such as Microsoft Hyperterminal, Hypoterminal or other RS232-based app).
+  # On the hyperterminal application, write 0/1 shall disable/enable a pin configured as output in the Minimus AVR.
+
+=== Walkthrough ===
+  # Code `/ext/LUFA-111009/Demos/Device/ClassDriver/VirtualSerial` imported from LUFA to `/src`.
