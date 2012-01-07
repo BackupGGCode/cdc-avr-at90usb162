@@ -24,4 +24,32 @@ MCU = at90usb162
 BOARD = MINIMUS
 F_CPU = 16000000
 }}}
-      * So now come the problems. Due to this change, the code does not build anymore. And we have to figure out why and fix it.
+      * So now come the problems. Due to this change, the code does not build anymore. And we have to figure out why and fix it. If you try to build from command-line, the errors messages are
+{{{
+make all
+
+-------- begin --------
+avr-gcc.exe (WinAVR 20100110) 4.3.3
+Copyright (C) 2008 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+
+Compiling C: VirtualSerial.c
+avr-gcc -c -mmcu=at90usb162 -I. -gdwarf-2 -DF_CPU=16000000UL -DF_USB=16000000UL -DBOARD=BOARD_MINIMUS -DARCH=ARCH_AVR8 -D USB_DEVICE_ONLY -D FIXED_CONTROL_ENDPOINT_SIZE=8 -D FIXED_NUM_CONFIGURATIONS=1 -D USE_FLASH_DESCRIPTORS -D USE_STATIC_OPTIONS="(USB_DEVICE_OPT_FULLSPEED | USB_OPT_REG_ENABLED | USB_OPT_AUTO_PLL)" -Os -funsigned-char -funsigned-bitfields -ffunction-sections -fno-inline-small-functions -fpack-struct -fshort-enums -fno-strict-aliasing -Wall -Wstrict-prototypes -Wa,-adhlns=./VirtualSerial.lst -I../ext/LUFA-111009/ -std=c99 -MMD -MP -MF .dep/VirtualSerial.o.d VirtualSerial.c -o VirtualSerial.o
+In file included from VirtualSerial.h:51,
+                 from VirtualSerial.c:37:
+../ext/LUFA-111009/LUFA/Drivers/Board/Joystick.h:119:31: error: Board/Joystick.h: No such file or directory
+VirtualSerial.c: In function 'SetupHardware':
+VirtualSerial.c:105: warning: implicit declaration of function 'Joystick_Init'
+VirtualSerial.c: In function 'CheckJoystickMovement':
+VirtualSerial.c:113: warning: implicit declaration of function 'Joystick_GetStatus'
+VirtualSerial.c:117: error: 'JOY_UP' undeclared (first use in this function)
+VirtualSerial.c:117: error: (Each undeclared identifier is reported only once
+VirtualSerial.c:117: error: for each function it appears in.)
+VirtualSerial.c:119: error: 'JOY_DOWN' undeclared (first use in this function)
+VirtualSerial.c:121: error: 'JOY_LEFT' undeclared (first use in this function)
+VirtualSerial.c:123: error: 'JOY_RIGHT' undeclared (first use in this function)
+VirtualSerial.c:125: error: 'JOY_PRESS' undeclared (first use in this function)
+make: ** [VirtualSerial.o] Erro 1
+}}}
