@@ -15,3 +15,5 @@ The high-level requirements for this application are:
 
 === Walkthrough ===
   # Code `/ext/LUFA-111009/Demos/Device/ClassDriver/VirtualSerial` imported from LUFA to `/src`.
+  # Convert the code to AVR Studio 5.
+  # Configure LUFA_PATH from `../../../..` to `../ext/LUFA-111009`.
