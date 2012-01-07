@@ -13,11 +13,27 @@ The high-level requirements for this application are:
   # This COMPORT shall be available for connecting with a hyperterminal application (such as Microsoft Hyperterminal, Hypoterminal or other RS232-based app).
   # On the hyperterminal application, write 0/1 shall disable/enable a pin configured as output in the Minimus AVR.
 
+=== Build ===
+You can build the project in two ways:
+  # In command-line
+{{{
+> make all
+}}}
+  # In AVR Studio 5
+{{{
+Menu Build->Build Solution
+}}}
+
+If the project is finished, you shall be able to generate the `.hex` file when making a build, so you can burn it to AT90USB162.
+
 === Walkthrough ===
   # Code `/ext/LUFA-111009/Demos/Device/ClassDriver/VirtualSerial` imported from LUFA to `/src`.
   # Convert the code to AVR Studio 5.
   # Changes in `makefile`:
-    # Configure `LUFA_PATH` from `../../../..` to `../ext/LUFA-111009`.
+    # Configure `LUFA_PATH` from `../../../..` to 
+{{{
+LUFA_PATH = ../ext/LUFA-111009
+}}}
     # Configure AT90USB162 chip parameters
 {{{
 MCU = at90usb162
