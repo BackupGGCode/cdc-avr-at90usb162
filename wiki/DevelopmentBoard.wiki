@@ -16,4 +16,12 @@ The high-level requirements for this application are:
 === Walkthrough ===
   # Code `/ext/LUFA-111009/Demos/Device/ClassDriver/VirtualSerial` imported from LUFA to `/src`.
   # Convert the code to AVR Studio 5.
-  # Configure LUFA_PATH from `../../../..` to `../ext/LUFA-111009`.
+  # Changes in `makefile`:
+    # Configure `LUFA_PATH` from `../../../..` to `../ext/LUFA-111009`.
+    # Configure AT90USB162 chip parameters
+{{{
+MCU = at90usb162
+BOARD = MINIMUS
+F_CPU = 16000000
+}}}
+      * So now come the problems. Due to this change, the code does not build anymore. And we have to figure out why and fix it.
