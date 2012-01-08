@@ -116,7 +116,7 @@ OBJDIR = .
 
 
 # Path to the LUFA library
-LUFA_PATH = ../../../..
+LUFA_PATH = ../ext/LUFA-beta
 
 
 # LUFA library compile-time options and predefined tokens
