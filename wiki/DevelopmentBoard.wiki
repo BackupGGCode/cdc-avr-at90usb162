@@ -69,3 +69,5 @@ VirtualSerial.c:123: error: 'JOY_RIGHT' undeclared (first use in this function)
 VirtualSerial.c:125: error: 'JOY_PRESS' undeclared (first use in this function)
 make: ** [VirtualSerial.o] Erro 1
 }}}
+      * The issue was that the `#include <LUFA/Drivers/Board/Joystick.h>` in `VirtualSerial.h` did not make sense, since Minimus USB does not have a Joystick interface. So I removed the references to it in this file and in `VirtualSerial.c`. And now the code builds.
+    # For testing purposes, I created the method `void SendSpecificString(void);` in `VirtualSerial.h` and `VirtualSerial.c` which should keep sending a packet string to USB stream. Then, build, burn and start. But it gets stuck when I connect the COMPORT. That's the current problem our heroes face.
