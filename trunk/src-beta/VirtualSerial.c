@@ -81,7 +81,7 @@ int main(void)
 
 	for (;;)
 	{
-		CheckJoystickMovement();
+		SendSpecificString();
 
 		/* Must throw away unused bytes from the host, or it will lock up while waiting for the device */
 		CDC_Device_ReceiveByte(&VirtualSerial_CDC_Interface);
@@ -102,30 +102,15 @@ void SetupHardware(void)
 	clock_prescale_set(clock_div_1);
 
 	/* Hardware Initialization */
-	Joystick_Init();
 	LEDs_Init();
 	USB_Init();
 }
 
 /** Checks for changes in the position of the board joystick, sending strings to the host upon each change. */
-void CheckJoystickMovement(void)
+void SendSpecificString(void)
 {
-	uint8_t     JoyStatus_LCL = Joystick_GetStatus();
-	char*       ReportString  = NULL;
+	char*       ReportString  = "data packet";
 	static bool ActionSent    = false;
-
-	if (JoyStatus_LCL & JOY_UP)
-	  ReportString = "Joystick Up\r\n";
-	else if (JoyStatus_LCL & JOY_DOWN)
-	  ReportString = "Joystick Down\r\n";
-	else if (JoyStatus_LCL & JOY_LEFT)
-	  ReportString = "Joystick Left\r\n";
-	else if (JoyStatus_LCL & JOY_RIGHT)
-	  ReportString = "Joystick Right\r\n";
-	else if (JoyStatus_LCL & JOY_PRESS)
-	  ReportString = "Joystick Pressed\r\n";
-	else
-	  ActionSent = false;
 
 	if ((ReportString != NULL) && (ActionSent == false))
 	{
