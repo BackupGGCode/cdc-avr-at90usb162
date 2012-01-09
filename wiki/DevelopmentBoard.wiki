@@ -12,6 +12,7 @@ The high-level requirements for this application are:
   # Connecting the Minimus AVR on an USB port on Windows 7/64 it shall enable a COMPORT.
   # This COMPORT shall be available for connecting with a hyperterminal application (such as Microsoft Hyperterminal, Hypoterminal or other RS232-based app).
   # On the hyperterminal application, write 0/1 shall disable/enable a pin configured as output in the Minimus AVR.
+  # For each disable/enable operation acomplished, the hyperterminal application shall be informed.
 
 === Build ===
 You can build the project in two ways:
