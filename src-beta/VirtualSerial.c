@@ -109,19 +109,11 @@ void SetupHardware(void)
 /** Checks for changes in the position of the board joystick, sending strings to the host upon each change. */
 void SendSpecificString(void)
 {
-	char*       ReportString  = "data packet";
-	static bool ActionSent    = false;
+	char*       ReportString  = "data packet\r\n";
+	fputs(ReportString, &USBSerialStream);
 
-	if ((ReportString != NULL) && (ActionSent == false))
-	{
-		ActionSent = true;
-
-		/* Write the string to the virtual COM port via the created character stream */
-		fputs(ReportString, &USBSerialStream);
-
-		/* Alternatively, without the stream: */
-		// CDC_Device_SendString(&VirtualSerial_CDC_Interface, ReportString);
-	}
+	/* Alternatively, without the stream: */
+	// CDC_Device_SendString(&VirtualSerial_CDC_Interface, ReportString);
 }
 
 /** Event handler for the library USB Connection event. */
