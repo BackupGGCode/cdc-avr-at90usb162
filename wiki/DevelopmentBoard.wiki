@@ -77,3 +77,33 @@ make: ** [VirtualSerial.o] Erro 1
       * I discovered that the problem was with the condition loop inside the `SendSpecificString()` function. Actually it was a clutter code, so taking it out, the string is been printing on hyperterminal continuously as expected. Success!
     # For now I launched our first .hex and tag release. Check it out on [http://code.google.com/p/cdc-avr-at90usb162/downloads/list Downloads] page.
     # Let's continue our journey. The next step is to choose a pin to be our output, read the input from hyperterminal (0 or 1) and make it control the pin activation. And finally return to hyperterminal, a success message. 
+      * First step is to disable method `SendSpecificString()` from main loop, since we no longer want to send a constant string to hyperterminal. 
+      * Now we have to change the pin-out configuration for the microchip. This can be done in method `SetupHardware()`. We add the following code.
+{{{
+	/* Pin Out Configuration */
+	DDRB = 0xff; // All portB pins are configured as output
+	PORTB = 0x00;
+}}}
+      * And finally we add the method `ReadFromStreamAndWriteToPin()` below.
+{{{
+void ReadFromStreamAndWriteToPin(void){
+	char* ReportString;
+	char* BufferString;
+	fgets(ReportString, sizeof(ReportString),&USBSerialStream);
+	
+	if (ReportString != BufferString){
+		fputs(ReportString, &USBSerialStream);
+		BufferString = ReportString;
+	}
+	
+	
+	/*if (ReportString = "a"){
+		PORTB = 0xff;
+	}
+	else{
+		PORTB = 0x00;
+	}*/
+}
+}}}
+
+So I want to read a string and send to hyperterminal the read string. But something is very wrong!
