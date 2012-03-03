@@ -81,8 +81,9 @@ int main(void)
 
 	for (;;)
 	{
-		SendSpecificString();
-
+		//SendSpecificString();
+		ReadFromStreamAndWriteToPin();
+		
 		/* Must throw away unused bytes from the host, or it will lock up while waiting for the device */
 		CDC_Device_ReceiveByte(&VirtualSerial_CDC_Interface);
 
@@ -104,6 +105,29 @@ void SetupHardware(void)
 	/* Hardware Initialization */
 	LEDs_Init();
 	USB_Init();
+	
+	/* Pin Out Configuration */
+	DDRB = 0xff; // All portB pins are configured as output
+	PORTB = 0x00;
+}
+
+void ReadFromStreamAndWriteToPin(void){
+	char* ReportString;
+	char* BufferString;
+	fgets(ReportString, sizeof(ReportString),&USBSerialStream);
+	
+	if (ReportString != BufferString){
+		fputs(ReportString, &USBSerialStream);
+		BufferString = ReportString;
+	}
+	
+	
+	/*if (ReportString = "a"){
+		PORTB = 0xff;
+	}
+	else{
+		PORTB = 0x00;
+	}*/
 }
 
 /** Checks for changes in the position of the board joystick, sending strings to the host upon each change. */
