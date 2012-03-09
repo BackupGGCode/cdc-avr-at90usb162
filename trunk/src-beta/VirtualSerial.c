@@ -114,12 +114,33 @@ void SetupHardware(void)
 void ReadFromStreamAndWriteToPin(void){
 	char* ReportString;
 	char* BufferString;
-	fgets(ReportString, sizeof(ReportString),&USBSerialStream);
+	bool talkFlag = false;
+	
+	// Blink led
+	//for (int i=0;i<=5;i++){
+		PORTB = 0xff;
+		_delay_ms(100);
+		PORTB = 0x00;
+		_delay_ms(100);
+	//}
+	
+	//ReportString = CDC_Device_ReceiveByte(&USBSerialStream);
+	fgets(ReportString,sizeof(ReportString),&USBSerialStream);
 	
 	if (ReportString != BufferString){
 		fputs(ReportString, &USBSerialStream);
 		BufferString = ReportString;
 	}
+	
+
+	/*else{
+		if (talkFlag == false){
+			ReportString = "No use\n";
+			fputs(ReportString,&USBSerialStream);
+			talkFlag = true;
+		}
+	}*/
+	
 	
 	
 	/*if (ReportString = "a"){
