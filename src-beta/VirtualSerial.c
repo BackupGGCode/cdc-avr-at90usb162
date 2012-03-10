@@ -112,6 +112,23 @@ void SetupHardware(void)
 }
 
 void ReadFromStreamAndWriteToPin(void){
+	char ReportString[4]; // over dimension to allow for NUL
+	char* myConstant = "123";
+	char* itWorkedStr = "It worked!\r\n";
+	char* itDidNotWork = "It did not work!\r\n";
+	
+	fgets(ReportString,3,&USBSerialStream);
+	ReportString[3] = 0; // terminate data to make C string
+
+	if (strncmp(ReportString, myConstant, 3) == 0) {
+		PORTB = 0xff;
+		fputs(itWorkedStr,&USBSerialStream);
+	}		
+	else{
+		PORTB = 0x00;
+		fputs(itDidNotWork,&USBSerialStream);
+	}
+	/*
 	char* ReportString;
 	char* BufferString;
 	bool talkFlag = false;
@@ -149,6 +166,7 @@ void ReadFromStreamAndWriteToPin(void){
 	else{
 		PORTB = 0x00;
 	}*/
+	
 }
 
 /** Checks for changes in the position of the board joystick, sending strings to the host upon each change. */
