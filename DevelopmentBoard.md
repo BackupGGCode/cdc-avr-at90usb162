@@ -1,0 +1,106 @@
+# Development Board #
+**Host Machine** : I7 8GB RAM 1024 VRAM Windows 7/64
+
+## 1. Making a demo code run on AT90USB162 ##
+Let's start our application with the demo code from LUFA Device/ClassDriver/VirtualSerial in `/ext/LUFA-111009/Demos/Device/ClassDriver/VirtualSerial`. This folder is copied into `/src` and since it's not coded for AT90USB162, we have to modify it to make it run.
+
+### Requirements ###
+The high-level requirements for this application are:
+  1. Connecting the Minimus AVR on an USB port on Windows 7/64 it shall enable a COMPORT.
+  1. This COMPORT shall be available for connecting with a hyperterminal application (such as Microsoft Hyperterminal, Hypoterminal or other RS232-based app).
+  1. On the hyperterminal application, write 0/1 shall disable/enable a pin configured as output in the Minimus AVR.
+  1. For each disable/enable operation acomplished, the hyperterminal application shall be informed.
+
+### Build ###
+You can build the project in two ways:
+  1. In command-line
+```
+> make all
+```
+  1. In AVR Studio 5
+```
+Menu Build->Build Solution
+```
+
+If the project is finished, you shall be able to generate the `.hex` file when making a build, so you can burn it to AT90USB162.
+
+### Walkthrough ###
+  1. Code `/ext/LUFA-111009/Demos/Device/ClassDriver/VirtualSerial` imported from LUFA to `/src`.
+  1. Convert the code to AVR Studio 5.
+  1. Changes in `makefile`:
+    1. Configure `LUFA_PATH` from `../../../..` to
+```
+LUFA_PATH = ../ext/LUFA-111009
+```
+    1. Configure AT90USB162 chip parameters
+```
+MCU = at90usb162
+BOARD = MINIMUS
+F_CPU = 16000000
+```
+      * So now come the problems. Due to this change, the code does not build anymore. And we have to figure out why and fix it. If you try to build from command-line, the errors messages are
+```
+make all
+
+-------- begin --------
+avr-gcc.exe (WinAVR 20100110) 4.3.3
+Copyright (C) 2008 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+
+Compiling C: VirtualSerial.c
+avr-gcc -c -mmcu=at90usb162 -I. -gdwarf-2 -DF_CPU=16000000UL -DF_USB=16000000UL -DBOARD=BOARD_MINIMUS -DARCH=ARCH_AVR8 -D USB_DEVICE_ONLY -D FIXED_CONTROL_ENDPOINT_SIZE=8 -D FIXED_NUM_CONFIGURATIONS=1 -D USE_FLASH_DESCRIPTORS -D USE_STATIC_OPTIONS="(USB_DEVICE_OPT_FULLSPEED | USB_OPT_REG_ENABLED | USB_OPT_AUTO_PLL)" -Os -funsigned-char -funsigned-bitfields -ffunction-sections -fno-inline-small-functions -fpack-struct -fshort-enums -fno-strict-aliasing -Wall -Wstrict-prototypes -Wa,-adhlns=./VirtualSerial.lst -I../ext/LUFA-111009/ -std=c99 -MMD -MP -MF .dep/VirtualSerial.o.d VirtualSerial.c -o VirtualSerial.o
+In file included from VirtualSerial.h:51,
+                 from VirtualSerial.c:37:
+../ext/LUFA-111009/LUFA/Drivers/Board/Joystick.h:119:31: error: Board/Joystick.h: No such file or directory
+VirtualSerial.c: In function 'SetupHardware':
+VirtualSerial.c:105: warning: implicit declaration of function 'Joystick_Init'
+VirtualSerial.c: In function 'CheckJoystickMovement':
+VirtualSerial.c:113: warning: implicit declaration of function 'Joystick_GetStatus'
+VirtualSerial.c:117: error: 'JOY_UP' undeclared (first use in this function)
+VirtualSerial.c:117: error: (Each undeclared identifier is reported only once
+VirtualSerial.c:117: error: for each function it appears in.)
+VirtualSerial.c:119: error: 'JOY_DOWN' undeclared (first use in this function)
+VirtualSerial.c:121: error: 'JOY_LEFT' undeclared (first use in this function)
+VirtualSerial.c:123: error: 'JOY_RIGHT' undeclared (first use in this function)
+VirtualSerial.c:125: error: 'JOY_PRESS' undeclared (first use in this function)
+make: ** [VirtualSerial.o] Erro 1
+```
+      * The issue was that the `#include <LUFA/Drivers/Board/Joystick.h>` in `VirtualSerial.h` did not make sense, since Minimus USB does not have a Joystick interface. So I removed the references to it in this file and in `VirtualSerial.c`. And now the code builds.
+    1. For testing purposes, I created the method `void SendSpecificString(void);` in `VirtualSerial.h` and `VirtualSerial.c` which should keep sending a packet string to USB stream. Then, build, burn and start. But it gets stuck when I connect the COMPORT. That's the current problem our heroes face.
+      * It looks like LUFA had some updates, and this issue may be fixed. So while we do not have a release, I imported its code to `/ext/LUFA-beta` and we are going to continue our code in `/src-beta`. So I have import the VirtualSerial demo code to there, modify the `makefile` to the chip and LUFA-beta path, include remove the `joystick.h` references and include the function `SendSpecificString`. So now the code builds. Build it then, burn and activate the chip. You will see that the _stuck_ problem does not happen anymore.
+    1. Now I will work on the string transmission. As said before, I created the function `SendSpecificString` to keep sending a constant string to hyperterminal application. But when you connect the chip (plug into USB and connect from hyperterminal application), nothing happens. But at least chip's not stuck anymore.
+      * I discovered that the problem was with the condition loop inside the `SendSpecificString()` function. Actually it was a clutter code, so taking it out, the string is been printing on hyperterminal continuously as expected. Success!
+    1. For now I launched our first .hex and tag release. Check it out on [Downloads](http://code.google.com/p/cdc-avr-at90usb162/downloads/list) page.
+    1. Let's continue our journey. The next step is to choose a pin to be our output, read the input from hyperterminal (0 or 1) and make it control the pin activation. And finally return to hyperterminal, a success message.
+      * First step is to disable method `SendSpecificString()` from main loop, since we no longer want to send a constant string to hyperterminal.
+      * Now we have to change the pin-out configuration for the microchip. This can be done in method `SetupHardware()`. We add the following code.
+```
+	/* Pin Out Configuration */
+	DDRB = 0xff; // All portB pins are configured as output
+	PORTB = 0x00;
+```
+      * And finally we add the method `ReadFromStreamAndWriteToPin()` below.
+```
+void ReadFromStreamAndWriteToPin(void){
+	char* ReportString;
+	char* BufferString;
+	fgets(ReportString, sizeof(ReportString),&USBSerialStream);
+	
+	if (ReportString != BufferString){
+		fputs(ReportString, &USBSerialStream);
+		BufferString = ReportString;
+	}
+	
+	
+	/*if (ReportString = "a"){
+		PORTB = 0xff;
+	}
+	else{
+		PORTB = 0x00;
+	}*/
+}
+```
+
+So I want to read a string and send to hyperterminal the read string. But something is very wrong!
